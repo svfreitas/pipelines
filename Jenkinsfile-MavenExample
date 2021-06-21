@@ -38,7 +38,7 @@ pipeline {
         } 
         stage("teste"){
             steps ("test"){
-                sh "mvn test -DproxySet=true -Dhttps.proxyHost=10.13.11.252 -Dhttps.proxyPort=3128""
+                sh "mvn test -DproxySet=true -Dhttps.proxyHost=10.13.11.252 -Dhttps.proxyPort=3128"
             }
         }
                 
