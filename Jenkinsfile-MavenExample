@@ -36,9 +36,9 @@ pipeline {
                 sh "mvn package  -DskipTests=true -DproxySet=true -Dhttps.proxyHost=10.13.11.252 -Dhttps.proxyPort=3128"
             }
         } 
-        stage("sleep"){
-            steps ("sleep"){
-                sh "sleep 10"
+        stage("teste"){
+            steps ("test"){
+                sh "mvn test"
             }
         }
                 
