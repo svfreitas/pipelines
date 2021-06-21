@@ -1,44 +1,48 @@
 pipeline {
     agent {
-         label 'java-docker-slave'
+    kubernetes {
+      defaultContainer 'maven'  
+      yaml """\
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          labels:
+            devopsbox: maven
+        spec:
+          containers:
+          - name: maven
+            image:  maven:3.6.3-jdk-8
+            command:
+            - cat
+            tty: true
+        """.stripIndent()
+        }
     }
-    environment {
-        // This can be nexus3 or nexus2
-        NEXUS_VERSION = "nexus3"
-        // This can be http or https
-        NEXUS_PROTOCOL = "http"
-        // Where your Nexus is running. 'nexus-3' is defined in the docker-compose file
-        //NEXUS_URL = "host.docker.internal:8081"
-        //NEXUS_URL = "172.17.0.1:8081"
-        NEXUS_URL = "52.176.145.192:8081"
-        // Repository where we will upload the artifact
-        NEXUS_REPOSITORY = "devops_box_maven"
-        // Jenkins credential id to authenticate to Nexus OSS
-        NEXUS_CREDENTIAL_ID = "nexus-credentials"
-    }    
+ 
     stages {
         stage("clone sources") {
             steps {
-                    // Let's clone the source
                     git url: 'https://github.com/svfreitas/maven_example.git', branch: 'main'
                }
         }
-        stage ("build")
-        {
+        stage("teste curl"){
+            steps ("curl"){
+                sh "curl http://nexus-svc.devopsbox:8081"
+            }
+        }
+    
+        stage ("build") {
             steps {
-                sh "mvn package -DskipTests=true"
+                sh "mvn package  -DskipTests=true -DproxySet=true -Dhttps.proxyHost=10.13.11.252 -Dhttps.proxyPort=3128"
             }
         } 
-        stage('Test') { 
-            steps {
-                sh 'mvn test' 
+        stage("sleep"){
+            steps ("sleep"){
+                sh "sleep 10"
             }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml' 
-            }
-    }
         }
+                
+
         stage("publish to nexus") {
             steps {
                 script {
@@ -55,41 +59,13 @@ pipeline {
                     
                     if(artifactExists) {
                         echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
-                        
-                        nexusArtifactUploader(
-                            nexusVersion: NEXUS_VERSION,
-                            protocol: NEXUS_PROTOCOL,
-                            nexusUrl: NEXUS_URL,
-                            groupId: pom.groupId,
-                            version: pom.version,
-                            repository: NEXUS_REPOSITORY,
-                            credentialsId: NEXUS_CREDENTIAL_ID,
-                            artifacts: [
-                                // Artifact generated such as .jar, .ear and .war files.
-                                [artifactId: pom.artifactId,
-                                classifier: '',
-                                file: artifactPath,
-                                type: pom.packaging],
-
-                                // Lets upload the pom.xml file for additional information for Transitive dependencies
-                                [artifactId: pom.artifactId,
-                                classifier: '',
-                                file: "pom.xml",
-                                type: "pom"]
-                            ]
-                        );
-
+                        nexusPublisher nexusInstanceId: 'Nexus-Repo', nexusRepositoryId: 'devopsbox_maven', packages: [[$class: 'MavenPackage', mavenAssetList: [[classifier: '', extension: '', filePath: artifactPath]], mavenCoordinate: [artifactId: pom.artifactId, groupId: pom.groupId, packaging: pom.packaging, version: pom.version]]]
                     } else {
                         error "*** File: ${artifactPath}, could not be found";
                     }
                 }
             }
         }
+    }
 
-    }
-    post {
-        always {
-            junit 'target/surefire-reports/*.xml' 
-        }
-    }
 }
