@@ -50,18 +50,18 @@ pipeline {
     }
   }
   stages {
-        stage("clone sources") {
+        stage("Clone Sources From GitHub") {
             steps {
                     git url: 'https://github.com/svfreitas/maven_example.git', branch: 'main'
                }
         }
-        stage ("build")
+        stage ("Build code")
         {
             steps {
                 sh "mvn package -DskipTests=true -DproxySet=true -Dhttps.proxyHost=10.13.11.252 -Dhttps.proxyPort=3128"
             }
         } 
-        stage('Test') { 
+        stage('Test code') { 
             steps {
                 sh 'mvn test -DproxySet=true -Dhttps.proxyHost=10.13.11.252 -Dhttps.proxyPort=3128' 
             }
@@ -71,12 +71,29 @@ pipeline {
                 }
            }
         }
-        stage("publish to nexus") {
+        stage("Publish to Maven Nexus Repo") {
             steps {
-                sh 'echo "publish to nexus OK"'
-            }
+                script {
+                    // Read POM xml file using 'readMavenPom' step , this step 'readMavenPom' is included in: https://plugins.jenkins.io/pipeline-utility-steps
+                    pom = readMavenPom file: "pom.xml";
+                    // Find built artifact under target folder
+                    filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
+                    // Print some info from the artifact found
+                    echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+                    // Extract the path from the File found
+                    artifactPath = filesByGlob[0].path;
+                    // Assign to a boolean response verifying If the artifact name exists
+                    artifactExists = fileExists artifactPath;
+                    
+                    if(artifactExists) {
+                        echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
+                        nexusPublisher nexusInstanceId: 'Nexus-Repo', nexusRepositoryId: 'devopsbox_maven', packages: [[$class: 'MavenPackage', mavenAssetList: [[classifier: '', extension: '', filePath: artifactPath]], mavenCoordinate: [artifactId: pom.artifactId, groupId: pom.groupId, packaging: pom.packaging, version: pom.version]]]
+                    } else {
+                        error "*** File: ${artifactPath}, could not be found";
+                    }
+                }
         }
-        stage('Build Docker Image') {
+        stage('Build Image/Push to Docker Nexus Repo') {
         steps {
             container('builder') {
             script {
