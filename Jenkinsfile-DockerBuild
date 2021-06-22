@@ -67,7 +67,7 @@ pipeline {
         steps {
             container('builder') {
             script {
-                sh "/kaniko/executor  --build-arg HTTP_PROXY=10.13.11.252:3128 --dockerfile `pwd`/Dockerfile --context `pwd` --destination=10.13.16.37:30002/app:${env.BUILD_ID}"
+                sh "/kaniko/executor  --build-arg http_proxy=10.13.11.252:3128 --dockerfile `pwd`/Dockerfile --context `pwd` --destination=10.13.16.37:30002/app:${env.BUILD_ID}"
             } //container
             }
         } //steps
