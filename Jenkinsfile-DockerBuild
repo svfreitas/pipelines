@@ -13,6 +13,11 @@ pipeline {
         spec:
           containers:
           - name: maven
+            image:  maven:3.6.3-jdk-8
+            command:
+            - cat
+            tty: true
+          - name: builder
             env:
             - name: HTTP_PROXY
               value: http://10.13.11.252:3128
@@ -26,11 +31,6 @@ pipeline {
               value: http://10.13.11.252:3128
             - name: no_proxy 
               value: svc,local,default           
-            image:  maven:3.6.3-jdk-8
-            command:
-            - cat
-            tty: true
-          - name: builder
             image: gcr.io/kaniko-project/executor:debug
             imagePullPolicy: Always
             command:
