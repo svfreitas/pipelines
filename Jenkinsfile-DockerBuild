@@ -94,7 +94,7 @@ pipeline {
                 }
            }
         }
-        stage('Build Image/Push to Docker Nexus Repo') {
+        stage('Build Image and Push to Docker Nexus Repo') {
         steps {
             container('builder') {
             script {
