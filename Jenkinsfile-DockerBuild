@@ -24,13 +24,13 @@ pipeline {
             - name: HTTPS_PROXY
               value: http://10.13.11.252:3128
             - name: NO_PROXY 
-              value: svc,local,default       
+              value:  *.devopsbox         
             - name: http_proxy
               value: http://10.13.11.252:3128
             - name: https_proxy
               value: http://10.13.11.252:3128
             - name: no_proxy 
-              value: svc,local,default           
+              value: *.devopsbox           
             image: gcr.io/kaniko-project/executor:debug
             imagePullPolicy: Always
             command:
