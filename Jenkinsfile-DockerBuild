@@ -80,7 +80,7 @@ pipeline {
         steps {
             container('builder') {
             script {
-                sh "/kaniko/executor --insecure-registry --dockerfile `pwd`/Dockerfile --context `pwd` --destination=nexus-svc.devopsbox:5000/app:${env.BUILD_ID}"
+                sh "/kaniko/executor  --dockerfile `pwd`/Dockerfile --context `pwd` --destination=nexus-svc.devopsbox:5000/app:${env.BUILD_ID} --insecure-registry"
             } //container
             }
         } //steps
