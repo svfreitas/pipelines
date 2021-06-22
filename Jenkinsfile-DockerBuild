@@ -28,6 +28,19 @@ pipeline {
               mountPath: /kaniko/.docker
           volumes:
           - name: kaniko-secret
+            env:
+            - name: HTTP_PROXY
+              value: http://10.13.11.252:3128
+            - name: HTTPS_PROXY
+              value: http://10.13.11.252:3128
+            - name: NO_PROXY 
+              value: svc,local,default       
+            - name: http_proxy
+              value: http://10.13.11.252:3128
+            - name: https_proxy
+              value: http://10.13.11.252:3128
+            - name: no_proxy 
+              value: svc,local,default 
             secret:
                 secretName: registry-credentials
                 items:
@@ -67,7 +80,7 @@ pipeline {
         steps {
             container('builder') {
             script {
-                sh "/kaniko/executor  --build-arg https_proxy=10.13.11.252:3128 --dockerfile `pwd`/Dockerfile --context `pwd` --destination=10.13.16.37:30002/app:${env.BUILD_ID}"
+                sh "/kaniko/executor --dockerfile `pwd`/Dockerfile --context `pwd` --destination=10.13.16.37:30002/app:${env.BUILD_ID}"
             } //container
             }
         } //steps
