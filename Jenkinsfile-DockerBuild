@@ -13,6 +13,19 @@ pipeline {
         spec:
           containers:
           - name: maven
+            env:
+            - name: HTTP_PROXY
+              value: http://10.13.11.252:3128
+            - name: HTTPS_PROXY
+              value: http://10.13.11.252:3128
+            - name: NO_PROXY 
+              value: svc,local,default       
+            - name: http_proxy
+              value: http://10.13.11.252:3128
+            - name: https_proxy
+              value: http://10.13.11.252:3128
+            - name: no_proxy 
+              value: svc,local,default           
             image:  maven:3.6.3-jdk-8
             command:
             - cat
@@ -28,19 +41,6 @@ pipeline {
               mountPath: /kaniko/.docker
           volumes:
           - name: kaniko-secret
-            env:
-            - name: HTTP_PROXY
-              value: http://10.13.11.252:3128
-            - name: HTTPS_PROXY
-              value: http://10.13.11.252:3128
-            - name: NO_PROXY 
-              value: svc,local,default       
-            - name: http_proxy
-              value: http://10.13.11.252:3128
-            - name: https_proxy
-              value: http://10.13.11.252:3128
-            - name: no_proxy 
-              value: svc,local,default 
             secret:
                 secretName: registry-credentials
                 items:
