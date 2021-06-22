@@ -92,6 +92,7 @@ pipeline {
                         error "*** File: ${artifactPath}, could not be found";
                     }
                 }
+           }
         }
         stage('Build Image/Push to Docker Nexus Repo') {
         steps {
