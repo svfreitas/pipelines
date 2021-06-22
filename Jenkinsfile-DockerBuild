@@ -80,7 +80,7 @@ pipeline {
         steps {
             container('builder') {
             script {
-                sh "/kaniko/executor  --dockerfile `pwd`/Dockerfile --context `pwd` --destination=nexus-svc.devopsbox:5000/app:${env.BUILD_ID} --insecure"
+                sh "/kaniko/executor --build-arg  https_proxy=http://10.13.11.252:3128  --dockerfile `pwd`/Dockerfile --context `pwd` --destination=nexus-svc.devopsbox:5000/app:${env.BUILD_ID} --insecure"
             } //container
             }
         } //steps
