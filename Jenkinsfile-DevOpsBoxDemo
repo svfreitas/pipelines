@@ -105,7 +105,9 @@ pipeline {
         } //stage(build)
         stage('Deploy to Homologation') {
          steps {
+         script {
           kubernetesDeploy(configs: "yaml/demo-deployment.yaml", kubeconfigId: "mykubeconfig")
+          }
          } //steps
         } //stage
     }
