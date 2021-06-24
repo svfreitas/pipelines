@@ -1,0 +1,108 @@
+pipeline {
+ agent {
+    kubernetes {
+      cloud 'k8s-devopsbox'
+      defaultContainer 'maven' 
+      namespace 'devopsbox'
+      yaml """\
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          labels:
+            devopsbox: maven
+        spec:
+          containers:
+          - name: maven
+            image:  maven:3.6.3-jdk-8
+            command:
+            - cat
+            tty: true
+          - name: builder
+            env:
+            - name: HTTP_PROXY
+              value: http://10.13.11.252:3128
+            - name: HTTPS_PROXY
+              value: http://10.13.11.252:3128
+            - name: NO_PROXY 
+              value:  .devopsbox         
+            - name: http_proxy
+              value: http://10.13.11.252:3128
+            - name: https_proxy
+              value: http://10.13.11.252:3128
+            - name: no_proxy 
+              value: .devopsbox           
+            image: gcr.io/kaniko-project/executor:debug
+            imagePullPolicy: Always
+            command:
+            - /busybox/cat
+            tty: true
+            volumeMounts:
+            - name: kaniko-secret
+              mountPath: /kaniko/.docker
+          volumes:
+          - name: kaniko-secret
+            secret:
+                secretName: registry-credentials
+                items:
+                 - key: .dockerconfigjson
+                   path: config.json
+        """.stripIndent()
+    }
+  }
+  stages {
+        stage("Clone Sources From GitHub") {
+            steps {
+                    git url: 'https://github.com/svfreitas/devopsbox_demo.git', branch: 'main'
+               }
+        }
+        stage ("Build code")
+        {
+            steps {
+                sh "mvn package -DskipTests=true -DproxySet=true -Dhttps.proxyHost=10.13.11.252 -Dhttps.proxyPort=3128"
+            }
+        } 
+        stage('Test code') { 
+            steps {
+                sh 'mvn test -DproxySet=true -Dhttps.proxyHost=10.13.11.252 -Dhttps.proxyPort=3128' 
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml' 
+                }
+           }
+        }
+        stage("Publish to Maven Nexus Repo") {
+            steps {
+                script {
+                    // Read POM xml file using 'readMavenPom' step , this step 'readMavenPom' is included in: https://plugins.jenkins.io/pipeline-utility-steps
+                    pom = readMavenPom file: "pom.xml";
+                    // Find built artifact under target folder
+                    filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
+                    // Print some info from the artifact found
+                    echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+                    // Extract the path from the File found
+                    artifactPath = filesByGlob[0].path;
+                    // Assign to a boolean response verifying If the artifact name exists
+                    artifactExists = fileExists artifactPath;
+                    
+                    if(artifactExists) {
+                        echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
+                        nexusPublisher nexusInstanceId: 'Nexus-Repo', nexusRepositoryId: 'devopsbox_maven', packages: [[$class: 'MavenPackage', mavenAssetList: [[classifier: '', extension: '', filePath: artifactPath]], mavenCoordinate: [artifactId: pom.artifactId, groupId: pom.groupId, packaging: pom.packaging, version: pom.version]]]
+                    } else {
+                        error "*** File: ${artifactPath}, could not be found";
+                    }
+                }
+           }
+        }
+        stage('Build Image and Push to Docker Nexus Repo') {
+        steps {
+            container('builder') {
+            script {
+                sh "/kaniko/executor --dockerfile `pwd`/Dockerfile --context `pwd` --destination=nexus-svc.devopsbox:5000/demo:${env.BUILD_ID} --insecure"
+            } //container
+            }
+        } //steps
+        } //stage(build)
+
+    }
+}
