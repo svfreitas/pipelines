@@ -95,14 +95,18 @@ pipeline {
            }
         }
         stage('Build Image and Push to Docker Nexus Repo') {
-        steps {
-            container('builder') {
-            script {
-                sh "/kaniko/executor --dockerfile `pwd`/Dockerfile --context `pwd` --destination=nexus-svc.devopsbox:5000/demo:${env.BUILD_ID} --insecure"
-            } //container
-            }
-        } //steps
+         steps {
+             container('builder') {
+             script {
+                 sh "/kaniko/executor --dockerfile `pwd`/Dockerfile --context `pwd` --destination=nexus-svc.devopsbox:5000/demo:${env.BUILD_ID} --insecure"
+             } //container
+             }
+         } //steps
         } //stage(build)
-
+        stage('Deploy to Homologation') {
+         steps {
+          kubernetesDeploy(configs: "yaml/demo-deployment.yaml", kubeconfigId: "mykubeconfig")
+         } //steps
+        } //stage
     }
 }
