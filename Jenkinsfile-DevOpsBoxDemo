@@ -17,7 +17,20 @@ pipeline {
             command:
             - cat
             tty: true
-          - name: kubectl 
+          - name: kubectl
+            env:
+            - name: HTTP_PROXY
+              value: http://10.13.11.252:3128
+            - name: HTTPS_PROXY
+              value: http://10.13.11.252:3128
+            - name: NO_PROXY 
+              value:  .devopsbox         
+            - name: http_proxy
+              value: http://10.13.11.252:3128
+            - name: https_proxy
+              value: http://10.13.11.252:3128
+            - name: no_proxy 
+              value: .devopsbox   
             image:  bitnami/kubectl
             command:
             - cat
