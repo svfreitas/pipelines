@@ -136,7 +136,7 @@ BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUN5u2CkUwZ2Gjns1NGLCq
 FjjAjgMeM7AxAiAzDDVX7LsD/5R7qxFIQOshxR9rmJgco3Zs3f/fijIqqg==
 -----END CERTIFICATE-----
 ''', clusterName: 'k8s-demo', contextName: '', credentialsId: 'jenkins-k8s', namespace: 'devopsbox', serverUrl: 'https://kubernetes.default/') {
-    // some block
+    sh 'kubectl -n devopsbox get pods' 
 }
             }
          }
