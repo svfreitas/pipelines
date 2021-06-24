@@ -112,7 +112,7 @@ pipeline {
         stage('Deploy to Homologation enviroment') {
          steps{
             container('kubectl'){
-                withKubeConfig([credentialsId: 'jenkins-k82', serverUrl: 'https://kubernetes.default']) {
+                withKubeConfig([credentialsId: 'jenkins-k8s', serverUrl: 'https://kubernetes.default']) {
                  sh 'kubectl apply -f yaml/demo-deployment.yaml'
                 }
             }
