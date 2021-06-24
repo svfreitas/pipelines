@@ -17,6 +17,11 @@ pipeline {
             command:
             - cat
             tty: true
+          - name: kubectl 
+            image:  bitnami/kubectl
+            command:
+            - cat
+            tty: true            
           - name: builder
             env:
             - name: HTTP_PROXY
@@ -103,12 +108,13 @@ pipeline {
              }
          } //steps
         } //stage(build)
-        stage('Deploy to Homologation') {
-         steps {
-         script {
-            sh 'kubectl apply -f yaml/demo-deployment.yaml'
-          }
-         } //steps
-        } //stage
+
+        stage('Deploy to Homologation enviroment') {
+            container('kubectl'){
+                withKubeConfig([credentialsId: 'jenkins-k82', serverUrl: 'https://kubernetes.default']) {
+                 sh 'kubectl apply -f yaml/demo-deployment.yaml'
+            }
+            }
+        }
     }
 }
