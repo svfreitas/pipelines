@@ -126,7 +126,8 @@ pipeline {
          steps{
             container('kubectl'){
                 withKubeConfig([credentialsId: 'jenkins-k8s', serverUrl: 'https://kubernetes.default']) {
-                 sh 'kubectl -n devopsbox apply -f `pwd`/yaml/demo-deployment.yaml'
+               //  sh 'kubectl -n devopsbox apply -f `pwd`/yaml/demo-deployment.yaml'
+                 sh 'kubectl -n devopsbox get pods'
                 }
             }
          }
