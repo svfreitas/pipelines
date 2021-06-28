@@ -71,10 +71,9 @@ pipeline {
       stage('Preparation') {
     steps {
       script {
-        def p = jenkins.model.Jenkins.getInstance().proxy
-        env['http_proxy'] = "http://${p.name}:${p.port}"
+        env['http_proxy'] = 'http://10.13.11.252:3128'
         env['https_proxy'] = env['http_proxy']
-        env['no_proxy'] = p.noProxyHost
+        env['no_proxy'] = '.devopsbox'
       }
     }
   }
