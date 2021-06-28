@@ -68,16 +68,6 @@ pipeline {
     }
   }
   stages {
-      stage('Preparation') {
-    steps {
-      script {
-        env['http_proxy'] = 'http://10.13.11.252:3128'
-        env['https_proxy'] = 'http://10.13.11.252:3128'
-        env['no_proxy'] = '.devopsbox'
-      }
-    }
-  }
-  
         stage("Clone Sources From GitHub") {
             steps {
                     git url: 'https://github.com/svfreitas/devopsbox_demo.git', branch: 'main'
