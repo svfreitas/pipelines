@@ -68,6 +68,17 @@ pipeline {
     }
   }
   stages {
+      stage('Preparation') {
+    steps {
+      script {
+        def p = jenkins.model.Jenkins.getInstance().proxy
+        env['http_proxy'] = "http://${p.name}:${p.port}"
+        env['https_proxy'] = env['http_proxy']
+        env['no_proxy'] = p.noProxyHost
+      }
+    }
+  }
+  
         stage("Clone Sources From GitHub") {
             steps {
                     git url: 'https://github.com/svfreitas/devopsbox_demo.git', branch: 'main'
