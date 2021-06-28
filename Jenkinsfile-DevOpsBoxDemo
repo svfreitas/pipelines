@@ -1,4 +1,4 @@
-opipeline {
+pipeline {
  agent {
     kubernetes {
       cloud 'k8s-devopsbox'
