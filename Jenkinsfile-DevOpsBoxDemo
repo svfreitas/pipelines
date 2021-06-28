@@ -121,25 +121,33 @@ pipeline {
              }
          } //steps
         } //stage(build)
-
         stage('Deploy to Homologation enviroment') {
          steps{
-            container('kubectl'){
-withKubeConfig(caCertificate: '''-----BEGIN CERTIFICATE-----
-MIIBdzCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
-dmVyLWNhQDE2MjMzNTYwMjEwHhcNMjEwNjEwMjAxMzQxWhcNMzEwNjA4MjAxMzQx
-WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE2MjMzNTYwMjEwWTATBgcqhkjO
-PQIBBggqhkjOPQMBBwNCAAQTIvAp6S03dciqWRdTdk9KPluD9SxnaP/k1P4SZs+y
-2o3Uq+bpeLU4r0zcW4Y0yYOHBWOFsFpB4IcY7+V/k7QKo0IwQDAOBgNVHQ8BAf8E
-BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUN5u2CkUwZ2Gjns1NGLCq
-1bk/yMAwCgYIKoZIzj0EAwIDSAAwRQIhAP4IdCsfC4kFBWOoWbkDDssdnWa5pU5r
-FjjAjgMeM7AxAiAzDDVX7LsD/5R7qxFIQOshxR9rmJgco3Zs3f/fijIqqg==
------END CERTIFICATE-----
-''', clusterName: 'k8s-demo', contextName: '', credentialsId: 'jenkins-k8s', namespace: 'devopsbox', serverUrl: 'https://kubernetes.default/') {
-    sh 'kubectl config view' 
-}
+                kubernetesDeploy(
+                    configs: 'MyAwesomeApp/springboot-lb.yaml',
+                    kubeconfigId: 'K8S-AWS',
+                    enableConfigSubstitution: true
+                    )     
             }
-         }
         }
+//        stage('Deploy to Homologation enviroment') {
+//         steps{
+//            container('kubectl'){
+//withKubeConfig(caCertificate: '''-----BEGIN CERTIFICATE-----
+//MIIBdzCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+//dmVyLWNhQDE2MjMzNTYwMjEwHhcNMjEwNjEwMjAxMzQxWhcNMzEwNjA4MjAxMzQx
+//WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE2MjMzNTYwMjEwWTATBgcqhkjO
+//PQIBBggqhkjOPQMBBwNCAAQTIvAp6S03dciqWRdTdk9KPluD9SxnaP/k1P4SZs+y
+//2o3Uq+bpeLU4r0zcW4Y0yYOHBWOFsFpB4IcY7+V/k7QKo0IwQDAOBgNVHQ8BAf8E
+//BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUN5u2CkUwZ2Gjns1NGLCq
+//1bk/yMAwCgYIKoZIzj0EAwIDSAAwRQIhAP4IdCsfC4kFBWOoWbkDDssdnWa5pU5r
+//FjjAjgMeM7AxAiAzDDVX7LsD/5R7qxFIQOshxR9rmJgco3Zs3f/fijIqqg==
+//-----END CERTIFICATE-----
+//''', clusterName: 'k8s-demo', contextName: '', credentialsId: 'jenkins-k8s', namespace: 'devopsbox', serverUrl: 'https://kubernetes.default/') {
+ //   sh 'kubectl config view' 
+//}
+//            }
+ //        }
+  //      }
     }
 }
