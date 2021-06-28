@@ -1,4 +1,4 @@
-pipeline {
+opipeline {
  agent {
     kubernetes {
       cloud 'k8s-devopsbox'
@@ -124,7 +124,7 @@ pipeline {
         stage('Deploy to Homologation enviroment') {
          steps{
                 kubernetesDeploy(
-                    configs: 'MyAwesomeApp/springboot-lb.yaml',
+                    configs: 'deploy.yaml',
                     kubeconfigId: 'K8S-AWS',
                     enableConfigSubstitution: true
                     )     
