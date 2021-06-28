@@ -72,7 +72,7 @@ pipeline {
     steps {
       script {
         env['http_proxy'] = 'http://10.13.11.252:3128'
-        env['https_proxy'] = env['http_proxy']
+        env['https_proxy'] = 'http://10.13.11.252:3128'
         env['no_proxy'] = '.devopsbox'
       }
     }
