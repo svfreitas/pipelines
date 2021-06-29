@@ -67,7 +67,7 @@ pipeline {
         """.stripIndent()
     }
   }
-  envinroment{
+  environment{
    http_proxy='http://10.13.11.252:3128'
    https_proxy='http://10.13.11.252:3128'
   }
