@@ -59,7 +59,7 @@ pipeline {
         stage ("Build code")
         {
             steps {
-                sh "mvn package -DskipTests=true -DproxySet=true -Dhttps.proxyHost=10.13.11.252 -Dhttps.proxyPort=3128"
+                sh "mvn package -DskipTests=true"
             }
         } 
         stage('Test code') { 
