@@ -18,37 +18,11 @@ pipeline {
             - cat
             tty: true
           - name: kubectl
-            env:
-            - name: HTTP_PROXY
-              value: http://10.13.11.252:3128
-            - name: HTTPS_PROXY
-              value: http://10.13.11.252:3128
-            - name: NO_PROXY 
-              value:  .devopsbox         
-            - name: http_proxy
-              value: http://10.13.11.252:3128
-            - name: https_proxy
-              value: http://10.13.11.252:3128
-            - name: no_proxy 
-              value: .devopsbox   
             image:  bitnami/kubectl
             command:
             - cat
             tty: true            
           - name: builder
-            env:
-            - name: HTTP_PROXY
-              value: http://10.13.11.252:3128
-            - name: HTTPS_PROXY
-              value: http://10.13.11.252:3128
-            - name: NO_PROXY 
-              value:  .devopsbox         
-            - name: http_proxy
-              value: http://10.13.11.252:3128
-            - name: https_proxy
-              value: http://10.13.11.252:3128
-            - name: no_proxy 
-              value: .devopsbox           
             image: gcr.io/kaniko-project/executor:debug
             imagePullPolicy: Always
             command:
@@ -70,8 +44,10 @@ pipeline {
   environment{
    http_proxy='http://10.13.11.252:3128'
    https_proxy='http://10.13.11.252:3128'
+   no_proxy='.devopsbox'  
    HTTP_PROXY='http://10.13.11.252:3128'
    HTTPS_PROXY='http://10.13.11.252:3128'
+   NO_PROXY='.devopsbox'  
   }
   
   stages {
