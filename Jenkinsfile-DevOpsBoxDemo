@@ -67,6 +67,11 @@ pipeline {
         """.stripIndent()
     }
   }
+  envinroment{
+   http_proxy='http://10.13.11.252:3128'
+   https_proxy='http://10.13.11.252:3128'
+  }
+  
   stages {
         stage("Clone Sources From GitHub") {
             steps {
