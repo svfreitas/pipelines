@@ -41,15 +41,7 @@ pipeline {
         """.stripIndent()
     }
   }
-  environment{
-   http_proxy='http://10.13.11.252:3128'
-   https_proxy='http://10.13.11.252:3128'
-   no_proxy='.devopsbox'  
-   HTTP_PROXY='http://10.13.11.252:3128'
-   HTTPS_PROXY='http://10.13.11.252:3128'
-   NO_PROXY='.devopsbox'  
-  }
-  
+
   stages {
         stage("Clone Sources From GitHub") {
             steps {
